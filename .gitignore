@@ -4,4 +4,4 @@ node_modules/
 .DS_Store
 out/
 dist/
-*.log 
+*.log Postman-win64-Setup.exe
