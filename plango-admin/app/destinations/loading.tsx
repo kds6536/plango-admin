@@ -1,1 +1,3 @@
-export default function Loading() {\n  return null\n}
+export default function Loading() {
+  return null;
+}

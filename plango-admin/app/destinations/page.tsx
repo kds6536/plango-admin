@@ -1,18 +1,17 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import Button from "@/components/ui/button"
+import Input from "@/components/ui/input"
+import Card from "@/components/ui/card"
+import Badge from "@/components/ui/badge"
 import { Search, Star, Users, Clock } from "lucide-react"
 import Link from "next/link"
-import { useLanguage } from "hooks/use-language"
-import { useTranslations, type Translations } from "@/components/language-wrapper"
+// import { useLanguage } from "hooks/use-language"
+// import { useTranslations, type Translations } from "@/components/language-wrapper"
 
 export default function DestinationsPage() {
-  const { language } = useLanguage()
-  const t: Translations | any = useTranslations()
+  // const { language } = useLanguage()
+  // const t: Translations | any = useTranslations()
 
   const destinations = [
     {
@@ -98,10 +97,10 @@ export default function DestinationsPage() {
             Plan Go
           </Link>
           <nav className="hidden md:flex space-x-6">
-            <Link href="/" className="text-gray-600 hover:text-gray-900">{t?.nav?.home ?? "홈"}</Link>
-            <Link href="/destinations" className="text-green-600 font-medium">{t?.nav?.destinations ?? "인기 여행지"}</Link>
-            <Link href="/create-itinerary" className="text-gray-600 hover:text-gray-900">{t?.nav?.createItinerary ?? "여행 계획 만들기"}</Link>
-            <Link href="/profile" className="text-gray-600 hover:text-gray-900">{t?.nav?.profile ?? "내 계정"}</Link>
+            <Link href="/" className="text-gray-600 hover:text-gray-900">홈</Link>
+            <Link href="/destinations" className="text-green-600 font-medium">인기 여행지</Link>
+            <Link href="/create-itinerary" className="text-gray-600 hover:text-gray-900">여행 계획 만들기</Link>
+            <Link href="/profile" className="text-gray-600 hover:text-gray-900">내 계정</Link>
           </nav>
         </div>
       </header>
@@ -109,39 +108,29 @@ export default function DestinationsPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">{t?.destinations?.title ?? "인기 여행지"}</h1>
-          <p className="text-gray-600 text-lg mb-8">{t?.destinations?.subtitle ?? "전 세계 여행자들이 사랑하는 최고의 여행 목적지를 발견하세요"}</p>
+          <h1 className="text-4xl font-bold mb-4">인기 여행지</h1>
+          <p className="text-gray-600 text-lg mb-8">전 세계 여행자들이 사랑하는 최고의 여행 목적지를 발견하세요</p>
 
           {/* Search and Filters */}
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-col md:flex-row gap-4 mb-6">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <Input placeholder={t?.destinations?.searchPlaceholder ?? "도시나 국가를 검색하세요..."} className="pl-10" />
+                <Input placeholder="도시나 국가를 검색하세요..." className="pl-10" />
               </div>
-              <Select>
-                <SelectTrigger className="w-full md:w-48">
-                  <SelectValue placeholder={t?.destinations?.region ?? "지역 선택"} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="asia">{t?.destinations?.asia ?? "아시아"}</SelectItem>
-                  <SelectItem value="europe">{t?.destinations?.europe ?? "유럽"}</SelectItem>
-                  <SelectItem value="america">{t?.destinations?.america ?? "아메리카"}</SelectItem>
-                  <SelectItem value="oceania">{t?.destinations?.oceania ?? "오세아니아"}</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select>
-                <SelectTrigger className="w-full md:w-48">
-                  <SelectValue placeholder={t?.destinations?.style ?? "여행 스타일"} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="culture">{t?.destinations?.culture ?? "문화"}</SelectItem>
-                  <SelectItem value="nature">{t?.destinations?.nature ?? "자연"}</SelectItem>
-                  <SelectItem value="food">{t?.destinations?.food ?? "음식"}</SelectItem>
-                  <SelectItem value="romantic">{t?.destinations?.romantic ?? "로맨틱"}</SelectItem>
-                  <SelectItem value="adventure">{t?.destinations?.adventure ?? "모험"}</SelectItem>
-                </SelectContent>
-              </Select>
+              <select>
+                <option value="asia">아시아</option>
+                <option value="europe">유럽</option>
+                <option value="america">아메리카</option>
+                <option value="oceania">오세아니아</option>
+              </select>
+              <select>
+                <option value="culture">문화</option>
+                <option value="nature">자연</option>
+                <option value="food">음식</option>
+                <option value="romantic">로맨틱</option>
+                <option value="adventure">모험</option>
+              </select>
             </div>
           </div>
         </div>
@@ -149,55 +138,47 @@ export default function DestinationsPage() {
         {/* Destinations Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {destinations.map((destination) => (
-            <Card key={destination.id} className="overflow-hidden hover:shadow-xl transition-shadow cursor-pointer">
-              <div className="aspect-video bg-gradient-to-r from-blue-400 to-purple-400 relative">
-                <div className="absolute top-4 right-4">
-                  <Badge className="bg-white text-gray-800">{destination.country}</Badge>
-                </div>
+            <Card key={destination.id}>
+              <div>
+                <Badge>{destination.country}</Badge>
               </div>
-              <CardContent className="p-6">
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="text-xl font-bold">{destination.name}</h3>
-                  <div className="flex items-center space-x-1">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm font-medium">{destination.rating}</span>
-                    <span className="text-sm text-gray-500">({destination.reviews})</span>
+              <div>
+                <div>
+                  <h3>{destination.name}</h3>
+                  <div>
+                    <Star />
+                    <span>{destination.rating}</span>
+                    <span>({destination.reviews})</span>
                   </div>
                 </div>
-
-                <p className="text-gray-600 mb-4">{destination.description}</p>
-
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Clock className="w-4 h-4 mr-2" />
-                    <span>{t?.destinations?.duration ?? "추천 기간"}: {destination.duration}</span>
+                <p>{destination.description}</p>
+                <div>
+                  <div>
+                    <Clock />
+                    <span>추천 기간: {destination.duration}</span>
                   </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Users className="w-4 h-4 mr-2" />
-                    <span>{t?.destinations?.travelers ?? "추천 인원"}: {destination.travelers}</span>
+                  <div>
+                    <Users />
+                    <span>추천 인원: {destination.travelers}</span>
                   </div>
                 </div>
-
-                <div className="flex flex-wrap gap-2 mb-4">
+                <div>
                   {destination.tags.map((tag, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
-                      {tag}
-                    </Badge>
+                    <Badge key={index}>{tag}</Badge>
                   ))}
                 </div>
-
-                <div className="flex space-x-2">
-                  <Button className="flex-1 bg-green-600 hover:bg-green-700">{t?.destinations?.createPlan ?? "일정 만들기"}</Button>
-                  <Button variant="outline" className="flex-1">{t?.destinations?.viewDetail ?? "자세히 보기"}</Button>
+                <div>
+                  <Button>일정 만들기</Button>
+                  <Button>자세히 보기</Button>
                 </div>
-              </CardContent>
+              </div>
             </Card>
           ))}
         </div>
 
         {/* Load More */}
         <div className="text-center mt-12">
-          <Button variant="outline" size="lg">{t?.destinations?.loadMore ?? "더 많은 여행지 보기"}</Button>
+          <Button>더 많은 여행지 보기</Button>
         </div>
       </div>
     </div>
