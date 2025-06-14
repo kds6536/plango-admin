@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    workerThreads: false,
-    cpus: 1
+    appDir: true
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
