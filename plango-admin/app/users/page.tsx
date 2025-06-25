@@ -18,7 +18,8 @@ import {
   Calendar,
   LogIn,
   Mail,
-  Phone
+  Phone,
+  DollarSign
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -175,6 +176,30 @@ export default function UsersPage() {
     return new Date(dateString).toLocaleDateString('ko-KR')
   }
 
+  const getPlanColor = (plan: string) => {
+    switch (plan) {
+      case '무료': return 'bg-gray-700/50 text-gray-300 border border-gray-600'
+      case '스타터': return 'bg-blue-900/50 text-blue-300 border border-blue-700'
+      case '프로': return 'bg-purple-900/50 text-purple-300 border border-purple-700'
+      case '엔터프라이즈': return 'bg-orange-900/50 text-orange-300 border border-orange-700'
+      default: return 'bg-gray-700/50 text-gray-300 border border-gray-600'
+    }
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case '활성': return 'bg-green-900/50 text-green-300 border border-green-700'
+      case '비활성': return 'bg-yellow-900/50 text-yellow-300 border border-yellow-700'
+      case '만료': return 'bg-red-900/50 text-red-300 border border-red-700'
+      default: return 'bg-gray-700/50 text-gray-300 border border-gray-600'
+    }
+  }
+
+  const totalUsers = users.length
+  const activeUsers = users.filter(u => u.status === 'active').length
+  const totalRevenue = users.reduce((sum, u) => sum + u.totalSpent, 0)
+  const totalTrips = users.reduce((sum, u) => sum + u.tripsCreated, 0)
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -197,7 +222,7 @@ export default function UsersPage() {
         </div>
 
         {/* 통계 카드 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 fade-in">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 fade-in">
           <Card className="card hover:glow transition-all duration-300">
             <div className="p-6">
               <div className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -205,7 +230,7 @@ export default function UsersPage() {
                 <Users className="h-4 w-4 text-blue-400" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-white">{users.length.toLocaleString()}</div>
+                <div className="text-2xl font-bold text-white">{totalUsers.toLocaleString()}</div>
                 <p className="text-xs text-slate-400 mt-1">전체 등록 사용자</p>
               </div>
             </div>
@@ -219,7 +244,7 @@ export default function UsersPage() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-white">
-                  {users.filter(u => u.status === 'active').length}
+                  {activeUsers.toLocaleString()}
                 </div>
                 <p className="text-xs text-slate-400 mt-1">현재 활성 상태</p>
               </div>
@@ -229,14 +254,14 @@ export default function UsersPage() {
           <Card className="card hover:glow transition-all duration-300">
             <div className="p-6">
               <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <h3 className="text-sm font-medium text-slate-300">유료 사용자</h3>
-                <Crown className="h-4 w-4 text-yellow-400" />
+                <h3 className="text-sm font-medium text-slate-300">총 수익</h3>
+                <DollarSign className="h-4 w-4 text-purple-400" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-white">
-                  {users.filter(u => u.plan !== 'free').length}
+                  {formatCurrency(totalRevenue)}
                 </div>
-                <p className="text-xs text-slate-400 mt-1">유료 플랜 이용자</p>
+                <p className="text-xs text-slate-400 mt-1">누적 수익</p>
               </div>
             </div>
           </Card>
@@ -244,14 +269,14 @@ export default function UsersPage() {
           <Card className="card hover:glow transition-all duration-300">
             <div className="p-6">
               <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <h3 className="text-sm font-medium text-slate-300">총 수익</h3>
-                <Crown className="h-4 w-4 text-purple-400" />
+                <h3 className="text-sm font-medium text-slate-300">총 여행 계획</h3>
+                <Calendar className="h-4 w-4 text-orange-400" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-white">
-                  {formatCurrency(users.reduce((sum, u) => sum + u.totalSpent, 0))}
+                  {totalTrips.toLocaleString()}
                 </div>
-                <p className="text-xs text-slate-400 mt-1">누적 수익</p>
+                <p className="text-xs text-slate-400 mt-1">총 여행 계획</p>
               </div>
             </div>
           </Card>
@@ -342,13 +367,13 @@ export default function UsersPage() {
                         </div>
                       </td>
                       <td className="py-4 px-4">
-                        <Badge className={`${planColors[user.plan]} text-white`}>
+                        <Badge className={`${getPlanColor(user.plan)} text-white`}>
                           {user.plan === 'enterprise' && <Crown className="w-3 h-3 mr-1" />}
                           {planLabels[user.plan]}
                         </Badge>
                       </td>
                       <td className="py-4 px-4">
-                        <Badge className={`${statusColors[user.status]} text-white`}>
+                        <Badge className={`${getStatusColor(user.status)} text-white`}>
                           {statusLabels[user.status]}
                         </Badge>
                       </td>
