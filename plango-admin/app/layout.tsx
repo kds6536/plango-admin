@@ -14,8 +14,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className="bg-gray-900 text-white">
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900">
+      <body>
+        <div className="min-h-screen bg-gray-900">
           <Navigation />
           <main>
             {children}
