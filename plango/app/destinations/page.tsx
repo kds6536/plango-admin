@@ -83,24 +83,24 @@ export default function DestinationsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="bg-white border-b">
+      <header className="bg-background border-b border-border">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold text-green-600">
             Plan Go
           </Link>
           <nav className="hidden md:flex space-x-6">
-            <Link href="/" className="text-gray-600 hover:text-gray-900">
+            <Link href="/" className="text-muted-foreground hover:text-foreground">
               홈
             </Link>
             <Link href="/destinations" className="text-green-600 font-medium">
               인기 여행지
             </Link>
-            <Link href="/create-itinerary" className="text-gray-600 hover:text-gray-900">
+            <Link href="/create-itinerary" className="text-muted-foreground hover:text-foreground">
               여행 계획
             </Link>
-            <Link href="/profile" className="text-gray-600 hover:text-gray-900">
+            <Link href="/profile" className="text-muted-foreground hover:text-foreground">
               내 계정
             </Link>
           </nav>
@@ -110,14 +110,14 @@ export default function DestinationsPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">인기 여행지</h1>
-          <p className="text-gray-600 text-lg mb-8">전 세계 여행자들이 사랑하는 최고의 여행 목적지를 발견하세요</p>
+          <h1 className="text-4xl font-bold mb-4 text-foreground">인기 여행지</h1>
+          <p className="text-muted-foreground text-lg mb-8">전 세계 여행자들이 사랑하는 최고의 여행 목적지를 발견하세요</p>
 
           {/* Search and Filters */}
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-col md:flex-row gap-4 mb-6">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                 <Input placeholder="도시나 국가를 검색하세요..." className="pl-10" />
               </div>
               <Select>
@@ -153,7 +153,7 @@ export default function DestinationsPage() {
             <Card key={destination.id} className="overflow-hidden hover:shadow-xl transition-shadow cursor-pointer">
               <div className="aspect-video bg-gradient-to-r from-blue-400 to-purple-400 relative">
                 <div className="absolute top-4 right-4">
-                  <Badge className="bg-white text-gray-800">{destination.country}</Badge>
+                  <Badge className="bg-background text-foreground">{destination.country}</Badge>
                 </div>
               </div>
               <CardContent className="p-6">
@@ -162,18 +162,18 @@ export default function DestinationsPage() {
                   <div className="flex items-center space-x-1">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                     <span className="text-sm font-medium">{destination.rating}</span>
-                    <span className="text-sm text-gray-500">({destination.reviews})</span>
+                    <span className="text-sm text-muted-foreground">({destination.reviews})</span>
                   </div>
                 </div>
 
-                <p className="text-gray-600 mb-4">{destination.description}</p>
+                <p className="text-muted-foreground mb-4">{destination.description}</p>
 
                 <div className="space-y-2 mb-4">
-                  <div className="flex items-center text-sm text-gray-600">
+                  <div className="flex items-center text-sm text-muted-foreground">
                     <Clock className="w-4 h-4 mr-2" />
                     <span>추천 기간: {destination.duration}</span>
                   </div>
-                  <div className="flex items-center text-sm text-gray-600">
+                  <div className="flex items-center text-sm text-muted-foreground">
                     <Users className="w-4 h-4 mr-2" />
                     <span>추천 인원: {destination.travelers}</span>
                   </div>

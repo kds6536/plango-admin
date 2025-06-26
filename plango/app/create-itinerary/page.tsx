@@ -43,7 +43,7 @@ export default function CreateItineraryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-12">
+    <div className="min-h-screen bg-background text-foreground py-12">
       <div className="container mx-auto px-4 max-w-2xl">
         <div className="text-center mb-8">
           <Link href="/" className="flex items-center justify-center space-x-3 mb-8">
@@ -57,12 +57,12 @@ export default function CreateItineraryPage() {
           <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
             ✈️ 여행 일정 만들기
           </h1>
-          <p className="text-xl text-gray-600">
+          <p className="text-xl text-muted-foreground">
             몇 가지 정보만 입력하시면 AI가 완벽한 맞춤형 여행 일정을 생성해드립니다 🎯
           </p>
         </div>
 
-        <Card className="shadow-2xl border-0 bg-white/90 backdrop-blur-sm">
+        <Card className="shadow-2xl border-0 bg-card/90 backdrop-blur-sm">
           <CardHeader className="bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-t-lg">
             <CardTitle className="text-2xl text-center">🌟 여행 정보 입력</CardTitle>
           </CardHeader>
@@ -90,7 +90,7 @@ export default function CreateItineraryPage() {
                   {destinations.map((dest, index) => (
                     <div
                       key={index}
-                      className="bg-green-100 text-green-800 px-3 py-1 rounded-full flex items-center space-x-2"
+                      className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full flex items-center space-x-2"
                     >
                       <span>{dest}</span>
                       <button onClick={() => removeDestination(index)} className="hover:text-red-600">
@@ -130,7 +130,7 @@ export default function CreateItineraryPage() {
 
             <div className="space-y-4">
               <Label className="text-lg font-semibold">👥 인원수</Label>
-              <div className="flex items-center justify-center space-x-6 bg-gray-50 rounded-lg p-4">
+                              <div className="flex items-center justify-center space-x-6 bg-muted rounded-lg p-4">
                 <Button
                   variant="outline"
                   size="icon"
@@ -149,7 +149,7 @@ export default function CreateItineraryPage() {
             <div className="space-y-4">
               <Label className="text-lg font-semibold">💰 가능 예산</Label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                 <Input
                   placeholder="예: 100만원, $2000, ¥200000..."
                   className="pl-10 h-12"
@@ -157,7 +157,7 @@ export default function CreateItineraryPage() {
                   onChange={(e) => setBudget(e.target.value)}
                 />
               </div>
-              <p className="text-sm text-gray-500">숙박, 식사, 교통, 관광 등 전체 예산을 입력해주세요</p>
+              <p className="text-sm text-muted-foreground">숙박, 식사, 교통, 관광 등 전체 예산을 입력해주세요</p>
             </div>
 
             <div className="space-y-4">
@@ -185,7 +185,7 @@ export default function CreateItineraryPage() {
                   {ageRanges.map((age, index) => (
                     <div
                       key={index}
-                      className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center space-x-2"
+                      className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full flex items-center space-x-2"
                     >
                       <span>{age}</span>
                       <button onClick={() => removeAgeRange(index)} className="hover:text-red-600">

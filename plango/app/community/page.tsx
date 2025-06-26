@@ -65,24 +65,24 @@ export default function CommunityPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="bg-white border-b">
+      <header className="bg-background border-b border-border">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold text-green-600">
             Plan Go
           </Link>
           <nav className="hidden md:flex space-x-6">
-            <Link href="/" className="text-gray-600 hover:text-gray-900">
+            <Link href="/" className="text-muted-foreground hover:text-foreground">
               홈
             </Link>
-            <Link href="/destinations" className="text-gray-600 hover:text-gray-900">
+            <Link href="/destinations" className="text-muted-foreground hover:text-foreground">
               인기 여행지
             </Link>
             <Link href="/community" className="text-green-600 font-medium">
               커뮤니티
             </Link>
-            <Link href="/profile" className="text-gray-600 hover:text-gray-900">
+            <Link href="/profile" className="text-muted-foreground hover:text-foreground">
               내 계정
             </Link>
           </nav>
@@ -97,7 +97,7 @@ export default function CommunityPage() {
             <Card>
               <CardContent className="p-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input placeholder="게시글 검색..." className="pl-10" />
                 </div>
               </CardContent>
@@ -115,7 +115,7 @@ export default function CommunityPage() {
                 {trendingTopics.map((topic, index) => (
                   <div key={index} className="flex justify-between items-center">
                     <span className="text-sm font-medium">#{topic.name}</span>
-                    <span className="text-xs text-gray-500">{topic.posts}</span>
+                    <span className="text-xs text-muted-foreground">{topic.posts}</span>
                   </div>
                 ))}
               </CardContent>
@@ -173,10 +173,10 @@ export default function CommunityPage() {
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
                             <span className="font-semibold">{post.author}</span>
-                            <span className="text-sm text-gray-500">{post.timeAgo}</span>
+                            <span className="text-sm text-muted-foreground">{post.timeAgo}</span>
                           </div>
                           <h3 className="text-lg font-bold mb-2">{post.title}</h3>
-                          <p className="text-gray-600 mb-3">{post.content}</p>
+                          <p className="text-muted-foreground mb-3">{post.content}</p>
 
                           {post.image && <div className="aspect-video bg-gray-200 rounded-lg mb-4 max-w-md"></div>}
 
@@ -188,7 +188,7 @@ export default function CommunityPage() {
                             ))}
                           </div>
 
-                          <div className="flex items-center space-x-6 text-gray-500">
+                          <div className="flex items-center space-x-6 text-muted-foreground">
                             <button className="flex items-center space-x-1 hover:text-red-500">
                               <Heart className="w-4 h-4" />
                               <span className="text-sm">{post.likes}</span>

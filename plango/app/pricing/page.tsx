@@ -19,7 +19,7 @@ export default function PricingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-12">
+    <div className="min-h-screen bg-background text-foreground py-12">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <Link href="/" className="flex items-center justify-center space-x-3 mb-8">
@@ -33,7 +33,7 @@ export default function PricingPage() {
           <h1 className="text-6xl font-bold mb-8 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             Plan Go 요금제
           </h1>
-          <p className="text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed font-medium">
+          <p className="text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed font-medium">
             여행 계획의 필요에 맞는 완벽한 요금제를 선택하세요
             <br />
             <span className="text-blue-600 font-semibold">모든 플랜에는 AI 기반 맞춤형 일정 생성이 포함됩니다</span>
@@ -43,63 +43,63 @@ export default function PricingPage() {
         {/* Pricing Plans */}
         <div className="grid lg:grid-cols-3 gap-12 max-w-7xl mx-auto mb-20">
           {/* Free Plan */}
-          <Card className="relative border-2 border-gray-300 shadow-xl hover:shadow-2xl transition-all duration-300 bg-white">
+          <Card className="relative border-2 border-border shadow-xl hover:shadow-2xl transition-all duration-300 bg-card">
             <CardHeader className="text-center pb-8 pt-12">
               <div className="w-20 h-20 bg-gradient-to-br from-gray-500 to-gray-700 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Star className="w-10 h-10 text-white" />
               </div>
-              <CardTitle className="text-3xl font-bold text-gray-800 mb-2">무료</CardTitle>
-              <div className="text-6xl font-black mt-6 text-gray-800">$0</div>
-              <p className="text-gray-600 mt-3 text-lg font-medium">기본 여행 계획</p>
+              <CardTitle className="text-3xl font-bold text-foreground mb-2">무료</CardTitle>
+              <div className="text-6xl font-black mt-6 text-foreground">$0</div>
+              <p className="text-muted-foreground mt-3 text-lg font-medium">기본 여행 계획</p>
             </CardHeader>
             <CardContent className="px-8 pb-12">
               <ul className="space-y-5 mb-10">
                 <li className="flex items-start">
                   <Check className="w-6 h-6 text-green-600 mr-4 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg text-gray-700">아주 간단한 여행 내용 생성</span>
+                  <span className="text-lg text-foreground">아주 간단한 여행 내용 생성</span>
                 </li>
                 <li className="flex items-start">
                   <Check className="w-6 h-6 text-green-600 mr-4 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg text-gray-700">기본 목적지 정보</span>
+                  <span className="text-lg text-foreground">기본 목적지 정보</span>
                 </li>
                 <li className="flex items-start">
                   <Check className="w-6 h-6 text-green-600 mr-4 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg text-gray-700">월 1회 일정 생성</span>
+                  <span className="text-lg text-foreground">월 1회 일정 생성</span>
                 </li>
               </ul>
-              <Button variant="outline" className="w-full h-16 text-lg font-semibold border-2 border-gray-300">
+              <Button variant="outline" className="w-full h-16 text-lg font-semibold border-2 border-border">
                 현재 플랜
               </Button>
             </CardContent>
           </Card>
 
           {/* One-time Plan */}
-          <Card className="relative border-2 border-blue-300 shadow-xl hover:shadow-2xl transition-all duration-300 bg-white">
+          <Card className="relative border-2 border-blue-300 shadow-xl hover:shadow-2xl transition-all duration-300 bg-card">
             <CardHeader className="text-center pb-8 pt-12">
               <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Zap className="w-10 h-10 text-white" />
               </div>
-              <CardTitle className="text-3xl font-bold text-gray-800 mb-2">1회 이용권</CardTitle>
+              <CardTitle className="text-3xl font-bold text-foreground mb-2">1회 이용권</CardTitle>
               <div className="text-6xl font-black mt-6 text-blue-600">$20</div>
-              <p className="text-gray-600 mt-3 text-lg font-medium">완벽한 일정 1회</p>
+              <p className="text-muted-foreground mt-3 text-lg font-medium">완벽한 일정 1회</p>
             </CardHeader>
             <CardContent className="px-8 pb-12">
               <ul className="space-y-5 mb-10">
                 <li className="flex items-start">
                   <Check className="w-6 h-6 text-green-600 mr-4 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg text-gray-700">여행 일정 1회 생성 가능</span>
+                  <span className="text-lg text-foreground">여행 일정 1회 생성 가능</span>
                 </li>
                 <li className="flex items-start">
                   <Check className="w-6 h-6 text-green-600 mr-4 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg text-gray-700">상세한 여행 내용 포함</span>
+                  <span className="text-lg text-foreground">상세한 여행 내용 포함</span>
                 </li>
                 <li className="flex items-start">
                   <Check className="w-6 h-6 text-green-600 mr-4 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg text-gray-700">맛집 및 명소 추천</span>
+                  <span className="text-lg text-foreground">맛집 및 명소 추천</span>
                 </li>
                 <li className="flex items-start">
                   <Check className="w-6 h-6 text-green-600 mr-4 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg text-gray-700">PDF 다운로드 지원</span>
+                  <span className="text-lg text-foreground">PDF 다운로드 지원</span>
                 </li>
               </ul>
               <Button
@@ -112,7 +112,7 @@ export default function PricingPage() {
           </Card>
 
           {/* Premium Plan */}
-          <Card className="relative border-4 border-purple-500 shadow-2xl hover:shadow-3xl transition-all duration-300 bg-gradient-to-br from-purple-50 to-pink-50 transform scale-105">
+                      <Card className="relative border-4 border-purple-500 shadow-2xl hover:shadow-3xl transition-all duration-300 bg-card transform scale-105">
             <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
               <span className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-full text-lg font-bold shadow-lg flex items-center">
                 <Crown className="w-5 h-5 mr-2" />
@@ -123,33 +123,33 @@ export default function PricingPage() {
               <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Shield className="w-10 h-10 text-white" />
               </div>
-              <CardTitle className="text-3xl font-bold text-gray-800 mb-2">프리미엄</CardTitle>
+              <CardTitle className="text-3xl font-bold text-foreground mb-2">프리미엄</CardTitle>
               <div className="text-6xl font-black mt-6 text-purple-600">
-                $50 <span className="text-2xl font-normal text-gray-600">/ 연간</span>
+                $50 <span className="text-2xl font-normal text-muted-foreground">/ 연간</span>
               </div>
-              <p className="text-gray-600 mt-3 text-lg font-medium">무제한 프리미엄 서비스</p>
+              <p className="text-muted-foreground mt-3 text-lg font-medium">무제한 프리미엄 서비스</p>
             </CardHeader>
             <CardContent className="px-8 pb-12">
               <ul className="space-y-5 mb-10">
                 <li className="flex items-start">
                   <Check className="w-6 h-6 text-green-600 mr-4 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg text-gray-700 font-medium">무제한 일정 생성</span>
+                  <span className="text-lg text-foreground font-medium">무제한 일정 생성</span>
                 </li>
                 <li className="flex items-start">
                   <Check className="w-6 h-6 text-green-600 mr-4 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg text-gray-700 font-medium">모든 고급 맞춤 설정 기능</span>
+                  <span className="text-lg text-foreground font-medium">모든 고급 맞춤 설정 기능</span>
                 </li>
                 <li className="flex items-start">
                   <Check className="w-6 h-6 text-green-600 mr-4 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg text-gray-700 font-medium">이미지, 링크 등 상세 정보 포함</span>
+                  <span className="text-lg text-foreground font-medium">이미지, 링크 등 상세 정보 포함</span>
                 </li>
                 <li className="flex items-start">
                   <Check className="w-6 h-6 text-green-600 mr-4 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg text-gray-700 font-medium">실시간 일정 수정</span>
+                  <span className="text-lg text-foreground font-medium">실시간 일정 수정</span>
                 </li>
                 <li className="flex items-start">
                   <Check className="w-6 h-6 text-green-600 mr-4 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg text-gray-700 font-medium">우선 지원 서비스</span>
+                  <span className="text-lg text-foreground font-medium">우선 지원 서비스</span>
                 </li>
               </ul>
               <Button
@@ -164,7 +164,7 @@ export default function PricingPage() {
 
         {/* Features Comparison */}
         <div className="max-w-6xl mx-auto mb-20">
-          <Card className="border-0 shadow-2xl bg-white/90 backdrop-blur-sm">
+          <Card className="border-0 shadow-2xl bg-card/90 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-4xl text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-bold">
                 플랜 비교
@@ -174,10 +174,10 @@ export default function PricingPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
-                    <tr className="border-b-2 border-gray-200">
-                      <th className="pb-6 text-xl font-bold text-gray-800">기능</th>
-                      <th className="pb-6 text-xl font-bold text-center text-gray-800">무료</th>
-                      <th className="pb-6 text-xl font-bold text-center text-gray-800">1회 이용권</th>
+                    <tr className="border-b-2 border-border">
+                      <th className="pb-6 text-xl font-bold text-foreground">기능</th>
+                      <th className="pb-6 text-xl font-bold text-center text-foreground">무료</th>
+                      <th className="pb-6 text-xl font-bold text-center text-foreground">1회 이용권</th>
                       <th className="pb-6 text-xl font-bold text-center text-purple-600">프리미엄</th>
                     </tr>
                   </thead>
@@ -189,10 +189,10 @@ export default function PricingPage() {
                       ["실시간 수정", "❌", "❌", "✅"],
                       ["우선 지원", "❌", "❌", "✅"],
                     ].map(([feature, free, oneTime, premium], index) => (
-                      <tr key={index} className="border-b border-gray-100">
-                        <td className="py-6 font-semibold text-lg text-gray-700">{feature}</td>
-                        <td className="py-6 text-center text-lg text-gray-600">{free}</td>
-                        <td className="py-6 text-center text-lg text-gray-600">{oneTime}</td>
+                      <tr key={index} className="border-b border-border">
+                        <td className="py-6 font-semibold text-lg text-foreground">{feature}</td>
+                        <td className="py-6 text-center text-lg text-muted-foreground">{free}</td>
+                        <td className="py-6 text-center text-lg text-muted-foreground">{oneTime}</td>
                         <td className="py-6 text-center text-lg font-semibold text-purple-600">{premium}</td>
                       </tr>
                     ))}
