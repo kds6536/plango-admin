@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { ThemeToggle } from "../../components/theme-toggle"
 import { Calendar, MapPin, Download, Edit, Trash2, Settings } from "lucide-react"
 import Link from "next/link"
 
@@ -43,20 +42,17 @@ export default function ProfilePage() {
   ]
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-card border-b border-border">
+      <header className="bg-white border-b">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-green-600 dark:text-green-400">
+          <Link href="/" className="text-2xl font-bold text-green-600">
             Plan Go
           </Link>
-          <div className="flex items-center space-x-2">
-            <ThemeToggle />
-            <Button variant="outline" size="sm">
-              <Settings className="w-4 h-4 mr-2" />
-              설정
-            </Button>
-          </div>
+          <Button variant="outline" size="sm">
+            <Settings className="w-4 h-4 mr-2" />
+            설정
+          </Button>
         </div>
       </header>
 
@@ -70,24 +66,24 @@ export default function ProfilePage() {
                   <AvatarImage src="/placeholder.svg?height=96&width=96" />
                   <AvatarFallback>홍길동</AvatarFallback>
                 </Avatar>
-                <h2 className="text-xl font-bold mb-2 text-foreground">홍길동</h2>
-                <p className="text-muted-foreground mb-4">hong@example.com</p>
+                <h2 className="text-xl font-bold mb-2">홍길동</h2>
+                <p className="text-gray-600 mb-4">hong@example.com</p>
                 <Badge variant="secondary" className="mb-4">
                   프리미엄 회원
                 </Badge>
 
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">총 여행 횟수:</span>
-                    <span className="font-semibold text-foreground">12회</span>
+                    <span>총 여행 횟수:</span>
+                    <span className="font-semibold">12회</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">저장된 일정:</span>
-                    <span className="font-semibold text-foreground">8개</span>
+                    <span>저장된 일정:</span>
+                    <span className="font-semibold">8개</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">방문한 국가:</span>
-                    <span className="font-semibold text-foreground">5개국</span>
+                    <span>방문한 국가:</span>
+                    <span className="font-semibold">5개국</span>
                   </div>
                 </div>
               </CardContent>
@@ -105,9 +101,9 @@ export default function ProfilePage() {
 
               <TabsContent value="itineraries" className="space-y-6">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-2xl font-bold text-foreground">저장된 여행 일정</h3>
+                  <h3 className="text-2xl font-bold">저장된 여행 일정</h3>
                   <Link href="/create-itinerary">
-                    <Button className="bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700">새 일정 만들기</Button>
+                    <Button className="bg-green-600 hover:bg-green-700">새 일정 만들기</Button>
                   </Link>
                 </div>
 
@@ -117,7 +113,7 @@ export default function ProfilePage() {
                       <div className="aspect-video bg-gradient-to-r from-blue-400 to-purple-400"></div>
                       <CardContent className="p-4">
                         <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-bold text-lg text-foreground">{itinerary.title}</h4>
+                          <h4 className="font-bold text-lg">{itinerary.title}</h4>
                           <Badge
                             variant={
                               itinerary.status === "완료"
@@ -130,11 +126,11 @@ export default function ProfilePage() {
                             {itinerary.status}
                           </Badge>
                         </div>
-                        <div className="flex items-center text-muted-foreground mb-2">
+                        <div className="flex items-center text-gray-600 mb-2">
                           <MapPin className="w-4 h-4 mr-1" />
                           <span className="text-sm">{itinerary.destination}</span>
                         </div>
-                        <div className="flex items-center text-muted-foreground mb-4">
+                        <div className="flex items-center text-gray-600 mb-4">
                           <Calendar className="w-4 h-4 mr-1" />
                           <span className="text-sm">{itinerary.dates}</span>
                         </div>
@@ -158,14 +154,14 @@ export default function ProfilePage() {
               </TabsContent>
 
               <TabsContent value="favorites" className="space-y-6">
-                <h3 className="text-2xl font-bold text-foreground">즐겨찾기</h3>
+                <h3 className="text-2xl font-bold">즐겨찾기</h3>
                 <div className="grid md:grid-cols-3 gap-4">
                   {["도쿄 스카이트리", "에펠탑", "제주 성산일출봉", "부산 해운대", "교토 금각사"].map(
                     (place, index) => (
                       <Card key={index} className="p-4">
-                        <div className="aspect-square bg-muted rounded mb-3"></div>
-                        <h4 className="font-semibold text-foreground">{place}</h4>
-                        <p className="text-sm text-muted-foreground">즐겨찾기에 추가됨</p>
+                        <div className="aspect-square bg-gray-200 rounded mb-3"></div>
+                        <h4 className="font-semibold">{place}</h4>
+                        <p className="text-sm text-gray-600">즐겨찾기에 추가됨</p>
                       </Card>
                     ),
                   )}
@@ -175,55 +171,40 @@ export default function ProfilePage() {
               <TabsContent value="settings" className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-foreground">테마 설정</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label className="text-base font-medium text-foreground">다크모드</Label>
-                        <p className="text-sm text-muted-foreground">어둡거나 밝은 테마를 선택하세요</p>
-                      </div>
-                      <ThemeToggle />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-foreground">개인정보 수정</CardTitle>
+                    <CardTitle>개인정보 수정</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="firstName" className="text-foreground">이름</Label>
+                        <Label htmlFor="firstName">이름</Label>
                         <Input id="firstName" defaultValue="길동" />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="lastName" className="text-foreground">성</Label>
+                        <Label htmlFor="lastName">성</Label>
                         <Input id="lastName" defaultValue="홍" />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email" className="text-foreground">이메일</Label>
+                      <Label htmlFor="email">이메일</Label>
                       <Input id="email" type="email" defaultValue="hong@example.com" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone" className="text-foreground">전화번호</Label>
+                      <Label htmlFor="phone">전화번호</Label>
                       <Input id="phone" defaultValue="010-1234-5678" />
                     </div>
-                    <Button className="bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700">변경사항 저장</Button>
+                    <Button className="bg-green-600 hover:bg-green-700">변경사항 저장</Button>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-foreground">구독 관리</CardTitle>
+                    <CardTitle>구독 관리</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex justify-between items-center mb-4">
                       <div>
-                        <h4 className="font-semibold text-foreground">프리미엄 플랜</h4>
-                        <p className="text-sm text-muted-foreground">다음 결제일: 2024.12.15</p>
+                        <h4 className="font-semibold">프리미엄 플랜</h4>
+                        <p className="text-sm text-gray-600">다음 결제일: 2024.12.15</p>
                       </div>
                       <Badge>활성</Badge>
                     </div>
