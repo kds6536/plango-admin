@@ -1,9 +1,109 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Download, Printer, Save, RotateCcw, Plane } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export default function ItineraryResultsPage() {
+  const router = useRouter()
+
+  // 일정 저장 기능
+  const handleSaveItinerary = () => {
+    const itineraryData = {
+      savedAt: new Date().toISOString(),
+      title: "추천 여행 일정",
+      destinations: ["도쿄", "아사쿠사", "시부야", "하라주쿠"],
+      duration: "3일",
+      savedDate: new Date().toLocaleDateString('ko-KR')
+    }
+
+    // 로컬 스토리지에 저장
+    const savedItineraries = JSON.parse(localStorage.getItem('savedItineraries') || '[]')
+    savedItineraries.push(itineraryData)
+    localStorage.setItem('savedItineraries', JSON.stringify(savedItineraries))
+
+    toast.success("일정이 성공적으로 저장되었습니다! 📝", {
+      description: "저장된 일정은 언제든지 확인할 수 있습니다.",
+      duration: 3000,
+    })
+  }
+
+  // 다른 일정 보기 (여행 일정 만들기로 이동)
+  const handleViewOtherItinerary = () => {
+    router.push('/create-itinerary')
+  }
+
+  // 일정 다운로드 기능
+  const handleDownloadItinerary = () => {
+    const itineraryText = `
+# 🎉 추천 여행 일정
+
+## 📍 전체 여행 경로
+도쿄역 → 아사쿠사 → 시부야 → 하라주쿠
+총 거리: 약 25km | 예상 소요시간: 3일
+
+## 볼거리 (명소)
+### 센소지 절
+도쿄에서 가장 오래된 불교 사원으로 전통적인 일본 문화를 체험할 수 있습니다.
+
+### 도쿄 스카이트리  
+634m 높이의 전망대에서 도쿄 전경을 한눈에 감상하세요.
+
+## 먹거리 (음식점)
+### 스시 다이
+츠키지 시장 근처의 유명한 스시 맛집으로 신선한 해산물을 맛볼 수 있습니다.
+
+### 라멘 이치란
+일본 전국에서 사랑받는 돈코츠 라멘 전문점입니다.
+
+## 놀거리 (체험/이벤트)
+### 기모노 체험
+아사쿠사에서 전통 기모노를 입고 일본 문화를 체험해보세요.
+
+## 축제 정보
+### 산자 마츠리
+5월 중순, 아사쿠사 신사에서 열리는 도쿄 3대 축제 중 하나입니다.
+
+## 숙소 정보
+### 시부야 비즈니스 호텔
+시부야 중심가에 위치한 깔끔하고 편리한 비즈니스 호텔입니다.
+
+## 교통편
+### JR 패스
+일본 전국의 JR 열차를 무제한 이용할 수 있는 외국인 전용 패스입니다.
+
+생성일: ${new Date().toLocaleDateString('ko-KR')}
+    `.trim()
+
+    const blob = new Blob([itineraryText], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `여행일정_${new Date().toLocaleDateString('ko-KR').replace(/\./g, '')}.txt`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+
+    toast.success("일정이 다운로드되었습니다! 📥", {
+      description: "파일이 다운로드 폴더에 저장되었습니다.",
+      duration: 3000,
+    })
+  }
+
+  // 프린트 기능
+  const handlePrintItinerary = () => {
+    window.print()
+    
+    toast.info("프린트 창이 열렸습니다! 🖨️", {
+      description: "프린터를 확인하고 인쇄를 진행해주세요.",
+      duration: 3000,
+    })
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground py-12">
       <div className="container mx-auto px-4">
@@ -23,13 +123,21 @@ export default function ItineraryResultsPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-center space-x-4 mb-12">
-          <Button variant="outline" className="flex items-center space-x-2 bg-card backdrop-blur-sm shadow-lg border-border">
-            <Save className="w-4 h-4" />
+        <div className="flex flex-wrap justify-center gap-4 mb-12">
+          <Button 
+            onClick={handleSaveItinerary}
+            variant="outline" 
+            className="flex items-center space-x-2 bg-card backdrop-blur-sm shadow-lg border-border hover:bg-muted/50 transition-colors"
+          >
+            <Save className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             <span>💾 이 일정 저장하기</span>
           </Button>
-          <Button variant="outline" className="flex items-center space-x-2 bg-card backdrop-blur-sm shadow-lg border-border">
-            <RotateCcw className="w-4 h-4" />
+          <Button 
+            onClick={handleViewOtherItinerary}
+            variant="outline" 
+            className="flex items-center space-x-2 bg-card backdrop-blur-sm shadow-lg border-border hover:bg-muted/50 transition-colors"
+          >
+            <RotateCcw className="w-4 h-4 text-green-600 dark:text-green-400" />
             <span>🔄 다른 일정 보기</span>
           </Button>
         </div>
@@ -213,12 +321,19 @@ export default function ItineraryResultsPage() {
               </div>
 
               <div className="flex space-x-4 pt-4">
-                <Button className="flex-1 bg-green-600 hover:bg-green-700">
-                  <Download className="w-4 h-4 mr-2" />
+                <Button 
+                  onClick={handleDownloadItinerary}
+                  className="flex-1 bg-green-600 hover:bg-green-700 transition-colors"
+                >
+                  <Download className="w-4 h-4 mr-2 text-white" />
                   일정 다운로드
                 </Button>
-                <Button variant="outline" className="flex-1 border-border">
-                  <Printer className="w-4 h-4 mr-2" />
+                <Button 
+                  onClick={handlePrintItinerary}
+                  variant="outline" 
+                  className="flex-1 border-border hover:bg-muted/50 transition-colors"
+                >
+                  <Printer className="w-4 h-4 mr-2 text-muted-foreground" />
                   바로 프린트
                 </Button>
               </div>
@@ -405,12 +520,19 @@ export default function ItineraryResultsPage() {
               </div>
 
               <div className="flex space-x-4 pt-4">
-                <Button className="flex-1 bg-green-600 hover:bg-green-700">
-                  <Download className="w-4 h-4 mr-2" />
+                <Button 
+                  onClick={handleDownloadItinerary}
+                  className="flex-1 bg-green-600 hover:bg-green-700 transition-colors"
+                >
+                  <Download className="w-4 h-4 mr-2 text-white" />
                   일정 다운로드
                 </Button>
-                <Button variant="outline" className="flex-1 border-border">
-                  <Printer className="w-4 h-4 mr-2" />
+                <Button 
+                  onClick={handlePrintItinerary}
+                  variant="outline" 
+                  className="flex-1 border-border hover:bg-muted/50 transition-colors"
+                >
+                  <Printer className="w-4 h-4 mr-2 text-muted-foreground" />
                   바로 프린트
                 </Button>
               </div>
