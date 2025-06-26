@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "../../components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { Download, Printer, Save, RotateCcw, Plane } from "lucide-react"
 
 export default function ItineraryResultsPage() {
@@ -83,7 +83,7 @@ export default function ItineraryResultsPage() {
             </span>
           </Link>
           <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            🎉 추천 여행 일정 (새로고침됨)
+            🎉 추천 여행 일정 
           </h1>
           <p className="text-xl text-muted-foreground">AI가 생성한 완벽한 맞춤형 여행 일정을 확인하세요 ✨</p>
         </div>
