@@ -9,11 +9,16 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 const OPENAI_MODELS = [
   { value: 'gpt-4o', label: 'gpt-4o (최신/고성능)' },
   { value: 'gpt-4-turbo', label: 'gpt-4-turbo' },
+  { value: 'gpt-4', label: 'gpt-4' },
   { value: 'gpt-3.5-turbo', label: 'gpt-3.5-turbo (기본/빠른 속도)' },
+  { value: 'gpt-3.5-turbo-16k', label: 'gpt-3.5-turbo-16k' },
 ]
 const GEMINI_MODELS = [
-  { value: 'gemini-1.5-pro-latest', label: 'gemini-1.5-pro-latest (최신)' },
-  { value: 'gemini-1.0-pro', label: 'gemini-1.0-pro (기본)' },
+  { value: 'gemini-2.5-pro', label: 'gemini-2.5-pro (최신)' },
+  { value: 'gemini-2.5-flash', label: 'gemini-2.5-flash' },
+  { value: 'gemini-2.0-flash', label: 'gemini-2.0-flash' },
+  { value: 'gemini-1.5-pro', label: 'gemini-1.5-pro' },
+  { value: 'gemini-1.5-flash', label: 'gemini-1.5-flash' },
 ]
 
 export default function AISettingsPage() {
@@ -48,12 +53,13 @@ export default function AISettingsPage() {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8005'
       const response = await fetch(`${apiUrl}/api/v1/admin/ai-settings`, {
-        method: 'POST',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          default_provider: defaultProvider,
+          provider: defaultProvider,
           openai_model: openaiModel,
           gemini_model: geminiModel,
+          updated_by: 'admin',
         })
       })
       if (response.ok) {
@@ -172,31 +178,20 @@ export default function AISettingsPage() {
         </Button>
       </div>
 
-      <Card className="p-6 mt-8">
-        <h3 className="text-lg font-semibold mb-4">현재 설정 정보</h3>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="font-medium">기본 제공자:</span>
-            <span className="capitalize gradient-text">{defaultProvider === 'openai' ? 'OpenAI GPT' : 'Google Gemini'}</span>
+      <Card className="p-6 mt-8 bg-gradient-to-r from-gray-900 to-gray-800 border-0 shadow-lg">
+        <h3 className="text-lg font-semibold mb-4 text-blue-200">현재 사용중인 AI 설정</h3>
+        <div className="flex flex-col gap-2 text-base">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-400">기본 제공자:</span>
+            <span className={`px-2 py-1 rounded font-bold ${defaultProvider === 'openai' ? 'bg-blue-700 text-blue-100' : 'bg-purple-700 text-purple-100'}`}>{defaultProvider === 'openai' ? 'OpenAI GPT' : 'Google Gemini'}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="font-medium">OpenAI 모델:</span>
-            <span>{openaiModel}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="font-medium">Gemini 모델:</span>
-            <span>{geminiModel}</span>
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-400">모델:</span>
+            <span className="px-2 py-1 rounded bg-gray-700 text-white font-mono">
+              {defaultProvider === 'openai' ? openaiModel : geminiModel}
+            </span>
           </div>
         </div>
-      </Card>
-
-      <Card className="p-6 bg-yellow-900/60 border-yellow-700 mt-8">
-        <h3 className="text-lg font-semibold mb-2 text-yellow-200">⚠️ 주의사항</h3>
-        <ul className="text-sm text-yellow-100 space-y-1">
-          <li>• AI 제공자/모델 변경 시 즉시 모든 API 요청에 적용됩니다</li>
-          <li>• 각 제공자별로 유효한 API 키가 환경변수로 설정되어 있어야 합니다</li>
-          <li>• 변경 후 여행 일정 생성 결과가 달라질 수 있습니다</li>
-        </ul>
       </Card>
     </div>
   )
