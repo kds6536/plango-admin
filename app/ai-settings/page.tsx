@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Card from '@/components/ui/card'
 import Button from '@/components/ui/button'
 import Select from '@/components/ui/select'
-import { RadioGroup, RadioGroupItem } from '../../../components/ui/radio-group'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
 const OPENAI_MODELS = [
   { value: 'gpt-4o', label: 'gpt-4o (최신/고성능)' },
