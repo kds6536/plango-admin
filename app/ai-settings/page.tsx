@@ -1,110 +1,93 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import axios from 'axios'
 import Card from '@/components/ui/card'
 import Button from '@/components/ui/button'
 import Select from '@/components/ui/select'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
+// --- 최신/정확한 모델 목록 ---
 const OPENAI_MODELS = [
-  { value: 'gpt-4o', label: 'gpt-4o (최신/고성능)' },
-  { value: 'gpt-4-turbo', label: 'gpt-4-turbo' },
-  { value: 'gpt-4', label: 'gpt-4' },
-  { value: 'gpt-3.5-turbo', label: 'gpt-3.5-turbo (기본/빠른 속도)' },
-  { value: 'gpt-3.5-turbo-16k', label: 'gpt-3.5-turbo-16k' },
+  { value: 'gpt-4o', label: 'gpt-4o (최신/최고성능)' },
+  { value: 'gpt-4-turbo', label: 'gpt-4-turbo (고성능)' },
+  { value: 'gpt-3.5-turbo', label: 'gpt-3.5-turbo (빠른 속도/저렴)' },
 ]
 const GEMINI_MODELS = [
-  { value: 'gemini-2.5-pro', label: 'gemini-2.5-pro (최신)' },
-  { value: 'gemini-2.5-flash', label: 'gemini-2.5-flash' },
-  { value: 'gemini-2.0-flash', label: 'gemini-2.0-flash' },
-  { value: 'gemini-1.5-pro', label: 'gemini-1.5-pro' },
-  { value: 'gemini-1.5-flash', label: 'gemini-1.5-flash' },
+  { value: 'gemini-1.5-pro-latest', label: 'Gemini 1.5 Pro (최신/대용량)' },
+  { value: 'gemini-1.5-flash-latest', label: 'Gemini 1.5 Flash (최신/빠른 속도)' },
+  { value: 'gemini-1.0-pro', label: 'Gemini 1.0 Pro (기본/안정)' },
 ]
 
+// --- 타입 명시 ---
+interface AISettings {
+  default_provider: 'openai' | 'gemini';
+  openai_model_name: string;
+  gemini_model_name: string;
+}
+
 export default function AISettingsPage() {
-  const [defaultProvider, setDefaultProvider] = useState<'openai' | 'gemini'>('openai')
-  const [openaiModel, setOpenaiModel] = useState('gpt-4o')
-  const [geminiModel, setGeminiModel] = useState('gemini-1.5-pro-latest')
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
+  const [currentSettings, setCurrentSettings] = useState<AISettings | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchSettings()
-  }, [])
-
+  // API 통신 (axios)
   const fetchSettings = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8005'
-      const response = await fetch(`${apiUrl}/api/v1/admin/ai-settings`)
-      if (response.ok) {
-        const data = await response.json()
-        setDefaultProvider(data.default_provider || 'openai')
-        setOpenaiModel(data.openai_model || 'gpt-4o')
-        setGeminiModel(data.gemini_model || 'gemini-1.5-pro-latest')
-      }
-    } catch (error) {
-      setMessage('❌ 설정 정보를 불러오지 못했습니다.')
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!apiUrl) throw new Error('API URL이 설정되지 않았습니다.');
+      const response = await axios.get(`${apiUrl}/admin/ai-settings`);
+      setCurrentSettings(response.data);
+    } catch (err) {
+      setError('❌ 설정 정보를 불러오지 못했습니다. API 서버가 실행 중인지 확인해주세요.');
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   }
 
+  useEffect(() => { fetchSettings(); }, []);
+
   const saveSettings = async () => {
-    setLoading(true)
-    setMessage('')
+    if (!currentSettings) return;
+    setLoading(true);
+    setError(null);
+    setSuccessMessage(null);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8005'
-      const response = await fetch(`${apiUrl}/api/v1/admin/ai-settings`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          provider: defaultProvider,
-          openai_model: openaiModel,
-          gemini_model: geminiModel,
-          updated_by: 'admin',
-        })
-      })
-      if (response.ok) {
-        setMessage('✅ AI 설정이 성공적으로 저장되었습니다!')
-        fetchSettings()
-      } else {
-        setMessage('❌ 설정 저장에 실패했습니다.')
-      }
-    } catch (error) {
-      setMessage('❌ 네트워크 오류가 발생했습니다.')
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!apiUrl) throw new Error('API URL이 설정되지 않았습니다.');
+      await axios.put(`${apiUrl}/admin/ai-settings`, currentSettings);
+      setSuccessMessage('✅ AI 설정이 성공적으로 저장되었습니다!');
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (err) {
+      setError('❌ 설정 저장에 실패했습니다. API 서버 로그를 확인해주세요.');
+      console.error(err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
+  }
+
+  if (loading && !currentSettings) {
+    return <div className="text-center py-20">설정 정보를 불러오는 중...</div>
+  }
+  if (error && !currentSettings) {
+    return <div className="text-center py-20 text-red-400">{error}</div>
   }
 
   return (
     <div className="max-w-3xl mx-auto py-8 space-y-8 fade-in">
       <h1 className="text-3xl font-bold gradient-text mb-2">AI 설정 관리</h1>
       <p className="text-gray-300 mb-6">Plango API에서 사용할 기본 AI 제공자와 상세 모델을 선택하세요.</p>
-
-      {message && (
-        <div className={`p-4 rounded-lg text-center font-semibold mb-4 ${message.includes('✅') ? 'bg-green-900 text-green-200' : 'bg-red-900 text-red-200'}`}>{message}</div>
-      )}
-
-      {/* 기본 제공자 선택 */}
-      <div className="flex justify-center mb-6">
-        <RadioGroup
-          className="flex gap-8"
-          value={defaultProvider}
-          onValueChange={(val: string) => setDefaultProvider(val as 'openai' | 'gemini')}
-        >
-          <label className="flex items-center gap-2 cursor-pointer">
-            <RadioGroupItem value="openai" />
-            <span className="font-semibold text-blue-300">OpenAI</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <RadioGroupItem value="gemini" />
-            <span className="font-semibold text-purple-300">Gemini</span>
-          </label>
-        </RadioGroup>
-      </div>
-
+      {successMessage && <div className="p-4 rounded-lg text-center font-semibold bg-green-900 text-green-200">{successMessage}</div>}
+      {error && <div className="p-4 rounded-lg text-center font-semibold bg-red-900 text-red-200">{error}</div>}
       <div className="grid gap-8 md:grid-cols-2">
         {/* OpenAI 카드 */}
-        <Card className={`p-6 card ${defaultProvider === 'openai' ? 'ring-2 ring-blue-400' : 'border-gray-700'}`}> 
+        <Card
+          className={`p-6 card cursor-pointer transition-all duration-200 ${currentSettings?.default_provider === 'openai' ? 'ring-2 ring-blue-400 scale-105 shadow-xl' : 'border-gray-700 opacity-70 hover:scale-105 hover:ring-2 hover:ring-blue-300'}`}
+          onClick={() => setCurrentSettings(prev => prev ? { ...prev, default_provider: 'openai' } : null)}
+        >
           <div className="flex items-center mb-4 gap-3">
             <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center text-white font-bold text-xl">AI</div>
             <div>
@@ -123,8 +106,8 @@ export default function AISettingsPage() {
           <div className="mb-2">
             <label className="block text-xs text-gray-400 mb-1">상세 모델</label>
             <Select
-              value={openaiModel}
-              onChange={e => setOpenaiModel(e.target.value)}
+              value={currentSettings?.openai_model_name}
+              onChange={e => setCurrentSettings(prev => prev ? { ...prev, openai_model_name: e.target.value } : null)}
               className="w-full bg-gray-900 text-blue-200 border-blue-400"
             >
               {OPENAI_MODELS.map(m => (
@@ -134,9 +117,11 @@ export default function AISettingsPage() {
           </div>
           <div className="text-xs text-gray-500 mt-2">API Key: 환경변수로 관리</div>
         </Card>
-
         {/* Gemini 카드 */}
-        <Card className={`p-6 card ${defaultProvider === 'gemini' ? 'ring-2 ring-purple-400' : 'border-gray-700'}`}> 
+        <Card
+          className={`p-6 card cursor-pointer transition-all duration-200 ${currentSettings?.default_provider === 'gemini' ? 'ring-2 ring-purple-400 scale-105 shadow-xl' : 'border-gray-700 opacity-70 hover:scale-105 hover:ring-2 hover:ring-purple-300'}`}
+          onClick={() => setCurrentSettings(prev => prev ? { ...prev, default_provider: 'gemini' } : null)}
+        >
           <div className="flex items-center mb-4 gap-3">
             <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">G</div>
             <div>
@@ -155,8 +140,8 @@ export default function AISettingsPage() {
           <div className="mb-2">
             <label className="block text-xs text-gray-400 mb-1">상세 모델</label>
             <Select
-              value={geminiModel}
-              onChange={e => setGeminiModel(e.target.value)}
+              value={currentSettings?.gemini_model_name}
+              onChange={e => setCurrentSettings(prev => prev ? { ...prev, gemini_model_name: e.target.value } : null)}
               className="w-full bg-gray-900 text-purple-200 border-purple-400"
             >
               {GEMINI_MODELS.map(m => (
@@ -167,7 +152,6 @@ export default function AISettingsPage() {
           <div className="text-xs text-gray-500 mt-2">API Key: 환경변수로 관리</div>
         </Card>
       </div>
-
       <div className="flex justify-end mt-8">
         <Button
           onClick={saveSettings}
@@ -177,21 +161,22 @@ export default function AISettingsPage() {
           {loading ? '저장 중...' : '설정 저장'}
         </Button>
       </div>
-
       <Card className="p-6 mt-8 bg-gradient-to-r from-gray-900 to-gray-800 border-0 shadow-lg">
-        <h3 className="text-lg font-semibold mb-4 text-blue-200">현재 사용중인 AI 설정</h3>
-        <div className="flex flex-col gap-2 text-base">
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-400">기본 제공자:</span>
-            <span className={`px-2 py-1 rounded font-bold ${defaultProvider === 'openai' ? 'bg-blue-700 text-blue-100' : 'bg-purple-700 text-purple-100'}`}>{defaultProvider === 'openai' ? 'OpenAI GPT' : 'Google Gemini'}</span>
+        <h3 className="text-lg font-semibold mb-4 text-blue-200">현재 사용중인 AI 설정 (DB 기준)</h3>
+        {currentSettings ? (
+          <div className="flex flex-col gap-2 text-base">
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-gray-400">기본 제공자:</span>
+              <span className={`px-2 py-1 rounded font-bold ${currentSettings.default_provider === 'openai' ? 'bg-blue-700 text-blue-100' : 'bg-purple-700 text-purple-100'}`}>{currentSettings.default_provider === 'openai' ? 'OpenAI GPT' : 'Google Gemini'}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-gray-400">현재 활성화된 모델:</span>
+              <span className="px-2 py-1 rounded bg-gray-700 text-white font-mono">
+                {currentSettings.default_provider === 'openai' ? currentSettings.openai_model_name : currentSettings.gemini_model_name}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-400">모델:</span>
-            <span className="px-2 py-1 rounded bg-gray-700 text-white font-mono">
-              {defaultProvider === 'openai' ? openaiModel : geminiModel}
-            </span>
-          </div>
-        </div>
+        ) : <p>설정 정보를 불러오지 못했습니다.</p>}
       </Card>
     </div>
   )
