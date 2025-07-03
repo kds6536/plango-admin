@@ -38,7 +38,7 @@ export default function AISettingsPage() {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       if (!apiUrl) throw new Error('API URL이 설정되지 않았습니다.');
-      const response = await axios.get(`${apiUrl}/admin/ai-settings`);
+      const response = await axios.get(`${apiUrl}/api/v1/admin/ai-settings`);
       setCurrentSettings(response.data);
     } catch (err) {
       setError('❌ 설정 정보를 불러오지 못했습니다. API 서버가 실행 중인지 확인해주세요.');
@@ -58,7 +58,7 @@ export default function AISettingsPage() {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       if (!apiUrl) throw new Error('API URL이 설정되지 않았습니다.');
-      await axios.put(`${apiUrl}/admin/ai-settings`, currentSettings);
+      await axios.put(`${apiUrl}/api/v1/admin/ai-settings`, currentSettings);
       setSuccessMessage('✅ AI 설정이 성공적으로 저장되었습니다!');
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
