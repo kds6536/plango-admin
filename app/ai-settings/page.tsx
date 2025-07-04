@@ -36,8 +36,8 @@ export default function AISettingsPage() {
     setLoading(true);
     setError(null);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      if (!apiUrl) throw new Error('API URL이 설정되지 않았습니다.');
+      // Railway 배포를 위한 하드코딩된 API URL
+      const apiUrl = 'https://plango-api-production.up.railway.app/api/v1';
       const response = await axios.get(`${apiUrl}/admin/ai-settings`);
       setCurrentSettings(response.data);
     } catch (err) {
@@ -56,19 +56,11 @@ export default function AISettingsPage() {
     setError(null);
     setSuccessMessage(null);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      if (!apiUrl) throw new Error('API URL이 설정되지 않았습니다.');
+      // Railway 배포를 위한 하드코딩된 API URL
+      const apiUrl = 'https://plango-api-production.up.railway.app/api/v1';
       
       console.log('전송할 데이터:', currentSettings);
       console.log('API URL:', `${apiUrl}/admin/ai-settings`);
-      
-      // 먼저 디버그 엔드포인트로 데이터 확인
-      try {
-        const debugResponse = await axios.put(`${apiUrl}/admin/debug-raw-data`, currentSettings);
-        console.log('디버그 응답:', debugResponse.data);
-      } catch (debugErr) {
-        console.error('디버그 에러:', debugErr);
-      }
       
       // 실제 저장 시도
       await axios.put(`${apiUrl}/admin/ai-settings`, currentSettings);
