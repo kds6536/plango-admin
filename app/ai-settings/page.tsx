@@ -58,12 +58,25 @@ export default function AISettingsPage() {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       if (!apiUrl) throw new Error('API URL이 설정되지 않았습니다.');
+      
+      console.log('전송할 데이터:', currentSettings);
+      console.log('API URL:', `${apiUrl}/admin/ai-settings`);
+      
+      // 먼저 디버그 엔드포인트로 데이터 확인
+      try {
+        const debugResponse = await axios.put(`${apiUrl}/admin/debug-raw-data`, currentSettings);
+        console.log('디버그 응답:', debugResponse.data);
+      } catch (debugErr) {
+        console.error('디버그 에러:', debugErr);
+      }
+      
+      // 실제 저장 시도
       await axios.put(`${apiUrl}/admin/ai-settings`, currentSettings);
       setSuccessMessage('✅ AI 설정이 성공적으로 저장되었습니다!');
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
+      console.error('저장 에러 상세:', err);
       setError('❌ 설정 저장에 실패했습니다. API 서버 로그를 확인해주세요.');
-      console.error(err);
     } finally {
       setLoading(false);
     }
