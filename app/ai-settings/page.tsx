@@ -1,47 +1,66 @@
 'use client'
 
-import { useState, useEffect, ChangeEvent } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import Card from '@/components/ui/card'
 import Button from '@/components/ui/button'
 import Select from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Database, Cpu, Settings, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react'
 
-// --- 최신/정확한 모델 목록 ---
+// --- v2.0 Enhanced AI Settings ---
 const OPENAI_MODELS = [
-  { value: 'gpt-4o', label: 'gpt-4o (최신/최고성능)' },
-  { value: 'gpt-4-turbo', label: 'gpt-4-turbo (고성능)' },
-  { value: 'gpt-3.5-turbo', label: 'gpt-3.5-turbo (빠른 속도/저렴)' },
+  { value: 'gpt-4', label: 'GPT-4 (최고 성능)' },
+  { value: 'gpt-4-turbo', label: 'GPT-4 Turbo (고성능/빠름)' },
+  { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo (빠른 속도)' },
 ]
+
 const GEMINI_MODELS = [
-  { value: 'gemini-1.5-pro-latest', label: 'Gemini 1.5 Pro (최신/대용량)' },
-  { value: 'gemini-1.5-flash-latest', label: 'Gemini 1.5 Flash (최신/빠른 속도)' },
-  { value: 'gemini-1.0-pro', label: 'Gemini 1.0 Pro (기본/안정)' },
+  { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash (빠른 속도)' },
+  { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro (고성능)' },
+  { value: 'gemini-1.0-pro', label: 'Gemini 1.0 Pro (안정성)' },
 ]
 
-// --- 타입 명시 ---
+// --- v2.0 Enhanced Types ---
 interface AISettings {
-  default_provider: 'openai' | 'gemini';
-  openai_model_name: string;
-  gemini_model_name: string;
+  provider: 'openai' | 'gemini';
+  openai_model: string;
+  gemini_model: string;
+  temperature: number;
+  max_tokens: number;
 }
 
-// 프롬프트 타입 추가
-interface Prompts {
-  stage1_destinations_prompt: string;
-  stage3_detailed_itinerary_prompt: string;
+interface SystemStatus {
+  supabase_connected: boolean;
+  current_ai_provider: string;
+  ai_model: string;
+  system_ready: boolean;
 }
+
+interface PromptData {
+  prompt_type: string;
+  prompt_content: string;
+}
+
+const PROMPT_TYPES = [
+  { value: 'itinerary_generation', label: '일정 생성 마스터 프롬프트' },
+  { value: 'place_recommendation', label: '장소 추천 프롬프트' },
+  { value: 'optimization', label: '동선 최적화 프롬프트' }
+]
 
 export default function AISettingsPage() {
   const [currentSettings, setCurrentSettings] = useState<AISettings | null>(null);
-  const [prompts, setPrompts] = useState<Prompts>({ stage1_destinations_prompt: '', stage3_detailed_itinerary_prompt: '' });
+  const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
+  const [selectedPromptType, setSelectedPromptType] = useState('itinerary_generation');
+  const [promptContent, setPromptContent] = useState('');
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'settings' | 'prompts' | 'status'>('settings');
 
   const getApiUrl = () => {
-    return process.env.NEXT_PUBLIC_API_URL || 'https://plango-api-production.up.railway.app/api/v1';
+    return process.env.NEXT_PUBLIC_API_URL || 'https://plango-api-production-0c8c.up.railway.app';
   }
 
   const fetchData = async () => {
@@ -49,12 +68,17 @@ export default function AISettingsPage() {
     setError(null);
     try {
       const apiUrl = getApiUrl();
-      const [settingsResponse, promptsResponse] = await Promise.all([
-        axios.get(`${apiUrl}/admin/ai-settings`),
-        axios.get(`${apiUrl}/admin/prompts`)
+      const [settingsResponse, statusResponse] = await Promise.all([
+        axios.get(`${apiUrl}/api/v1/admin/ai-settings`),
+        axios.get(`${apiUrl}/api/v1/admin/system/status`)
       ]);
-      setCurrentSettings(settingsResponse.data);
-      setPrompts(promptsResponse.data);
+      
+      setCurrentSettings(settingsResponse.data.data);
+      setSystemStatus(statusResponse.data.data);
+      
+      // 기본 프롬프트 로드
+      await fetchPrompt(selectedPromptType);
+      
     } catch (err) {
       setError('❌ 설정 정보를 불러오지 못했습니다. API 서버가 실행 중인지 확인해주세요.');
       console.error(err);
@@ -63,165 +87,351 @@ export default function AISettingsPage() {
     }
   }
 
-  useEffect(() => { fetchData(); }, []);
-
-  const saveAllSettings = async () => {
-    if (!currentSettings) return;
-    setLoading(true);
-    setError(null);
-    setSuccessMessage(null);
+  const fetchPrompt = async (promptType: string) => {
     try {
       const apiUrl = getApiUrl();
-      await Promise.all([
-        axios.put(`${apiUrl}/admin/ai-settings`, currentSettings),
-        axios.put(`${apiUrl}/admin/prompts`, prompts)
-      ]);
-      setSuccessMessage('✅ 모든 설정이 성공적으로 저장되었습니다!');
-      setTimeout(() => setSuccessMessage(null), 3000);
+      const response = await axios.get(`${apiUrl}/api/v1/admin/prompts/${promptType}`);
+      setPromptContent(response.data.data.prompt_content || '');
     } catch (err) {
-      console.error('저장 에러 상세:', err);
-      setError('❌ 설정 저장에 실패했습니다. API 서버 로그를 확인해주세요.');
+      console.error('프롬프트 로드 실패:', err);
+      setPromptContent('프롬프트를 로드할 수 없습니다.');
+    }
+  }
+
+  useEffect(() => { fetchData(); }, []);
+
+  useEffect(() => {
+    if (selectedPromptType) {
+      fetchPrompt(selectedPromptType);
+    }
+  }, [selectedPromptType]);
+
+  const saveAISettings = async () => {
+    if (!currentSettings) return;
+    setSaving(true);
+    setError(null);
+    setSuccessMessage(null);
+    
+    try {
+      const apiUrl = getApiUrl();
+      const response = await axios.put(`${apiUrl}/api/v1/admin/ai-settings`, currentSettings);
+      
+      if (response.data.success) {
+        setSuccessMessage(`✅ AI 설정 저장 완료! 현재 제공자: ${currentSettings.provider}`);
+        await fetchData(); // 상태 새로고침
+      }
+    } catch (err) {
+      console.error('AI 설정 저장 에러:', err);
+      setError('❌ AI 설정 저장에 실패했습니다.');
     } finally {
-      setLoading(false);
+      setSaving(false);
+      setTimeout(() => setSuccessMessage(null), 3000);
+    }
+  }
+
+  const savePrompt = async () => {
+    setSaving(true);
+    setError(null);
+    setSuccessMessage(null);
+    
+    try {
+      const apiUrl = getApiUrl();
+      const response = await axios.put(`${apiUrl}/api/v1/admin/prompts`, {
+        prompt_type: selectedPromptType,
+        prompt_content: promptContent
+      });
+      
+      if (response.data.success) {
+        setSuccessMessage(`✅ '${PROMPT_TYPES.find(p => p.value === selectedPromptType)?.label}' 프롬프트가 저장되었습니다!`);
+      }
+    } catch (err) {
+      console.error('프롬프트 저장 에러:', err);
+      setError('❌ 프롬프트 저장에 실패했습니다.');
+    } finally {
+      setSaving(false);
+      setTimeout(() => setSuccessMessage(null), 3000);
+    }
+  }
+
+  const testAIGeneration = async () => {
+    setSaving(true);
+    setError(null);
+    
+    try {
+      const apiUrl = getApiUrl();
+      const response = await axios.post(`${apiUrl}/api/v1/admin/test/ai-generation`);
+      
+      if (response.data.success) {
+        setSuccessMessage(`✅ AI 생성 테스트 성공! 응답 길이: ${response.data.data.response_length}자`);
+      }
+    } catch (err) {
+      console.error('AI 테스트 에러:', err);
+      setError('❌ AI 생성 테스트에 실패했습니다.');
+    } finally {
+      setSaving(false);
+      setTimeout(() => setSuccessMessage(null), 3000);
     }
   }
 
   if (loading && !currentSettings) {
-    return <div className="text-center py-20">설정 정보를 불러오는 중...</div>
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="animate-spin h-8 w-8 mr-2" />
+        <span>Supabase에서 설정 정보를 불러오는 중...</span>
+      </div>
+    );
   }
+
   if (error && !currentSettings) {
-    return <div className="text-center py-20 text-red-400">{error}</div>
+    return (
+      <div className="text-center py-20">
+        <AlertCircle className="h-16 w-16 mx-auto mb-4 text-red-400" />
+        <div className="text-red-400">{error}</div>
+        <Button onClick={fetchData} className="mt-4">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          다시 시도
+        </Button>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-3xl mx-auto py-8 space-y-8 fade-in">
-      <h1 className="text-3xl font-bold gradient-text mb-2">AI 설정 관리</h1>
-      <p className="text-gray-300 mb-6">Plango API에서 사용할 기본 AI 제공자와 상세 모델, 그리고 각 단계별 프롬프트를 관리하세요.</p>
-      {successMessage && <div className="p-4 rounded-lg text-center font-semibold bg-green-900 text-green-200">{successMessage}</div>}
-      {error && <div className="p-4 rounded-lg text-center font-semibold bg-red-900 text-red-200">{error}</div>}
-      <div className="grid gap-8 md:grid-cols-2">
-        {/* OpenAI 카드 */}
-        <Card
-          className={`p-6 card cursor-pointer transition-all duration-200 ${currentSettings?.default_provider === 'openai' ? 'ring-2 ring-blue-400 scale-105 shadow-xl' : 'border-gray-700 opacity-70 hover:scale-105 hover:ring-2 hover:ring-blue-300'}`}
-          onClick={() => setCurrentSettings(prev => prev ? { ...prev, default_provider: 'openai' } : null)}
-        >
-          <div className="flex items-center mb-4 gap-3">
-            <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center text-white font-bold text-xl">AI</div>
-            <div>
-              <h3 className="text-lg font-bold gradient-text">OpenAI GPT</h3>
-              <p className="text-sm text-gray-400">ChatGPT 기반 AI 서비스</p>
-            </div>
-          </div>
-          <div className="mb-4 text-sm text-gray-300">
-            <strong>특징:</strong>
-            <ul className="mt-1 space-y-1">
-              <li>• 자연스러운 대화형 응답</li>
-              <li>• 창의적인 여행 일정 생성</li>
-              <li>• 다양한 언어 지원</li>
-            </ul>
-          </div>
-          <div className="mb-2">
-            <label className="block text-xs text-gray-400 mb-1">상세 모델</label>
-            <Select
-              value={currentSettings?.openai_model_name}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) => setCurrentSettings(prev => prev ? { ...prev, openai_model_name: e.target.value } : null)}
-              className="w-full bg-gray-900 text-blue-200 border-blue-400"
-            >
-              {OPENAI_MODELS.map(m => (
-                <option key={m.value} value={m.value}>{m.label}</option>
-              ))}
-            </Select>
-          </div>
-          <div className="text-xs text-gray-500 mt-2">API Key: 환경변수로 관리</div>
-        </Card>
-        {/* Gemini 카드 */}
-        <Card
-          className={`p-6 card cursor-pointer transition-all duration-200 ${currentSettings?.default_provider === 'gemini' ? 'ring-2 ring-purple-400 scale-105 shadow-xl' : 'border-gray-700 opacity-70 hover:scale-105 hover:ring-2 hover:ring-purple-300'}`}
-          onClick={() => setCurrentSettings(prev => prev ? { ...prev, default_provider: 'gemini' } : null)}
-        >
-          <div className="flex items-center mb-4 gap-3">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">G</div>
-            <div>
-              <h3 className="text-lg font-bold gradient-text">Google Gemini</h3>
-              <p className="text-sm text-gray-400">구글의 최신 AI 모델</p>
-            </div>
-          </div>
-          <div className="mb-4 text-sm text-gray-300">
-            <strong>특징:</strong>
-            <ul className="mt-1 space-y-1">
-              <li>• 빠른 응답 속도</li>
-              <li>• 구글 서비스와 연동</li>
-              <li>• 멀티모달 AI 지원</li>
-            </ul>
-          </div>
-          <div className="mb-2">
-            <label className="block text-xs text-gray-400 mb-1">상세 모델</label>
-            <Select
-              value={currentSettings?.gemini_model_name}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) => setCurrentSettings(prev => prev ? { ...prev, gemini_model_name: e.target.value } : null)}
-              className="w-full bg-gray-900 text-purple-200 border-purple-400"
-            >
-              {GEMINI_MODELS.map(m => (
-                <option key={m.value} value={m.value}>{m.label}</option>
-              ))}
-            </Select>
-          </div>
-          <div className="text-xs text-gray-500 mt-2">API Key: 환경변수로 관리</div>
-        </Card>
+    <div className="max-w-4xl mx-auto py-8 space-y-8">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold gradient-text mb-2">
+          <Database className="inline h-8 w-8 mr-2" />
+          Plango AI 관리 v2.0
+        </h1>
+        <p className="text-gray-300">Supabase 기반 실시간 AI 설정 및 마스터 프롬프트 관리</p>
       </div>
 
-      <Card className="p-6 mt-8 bg-gradient-to-r from-gray-900 to-gray-800 border-0 shadow-lg">
-        <h3 className="text-lg font-semibold mb-4 text-blue-200">프롬프트 관리</h3>
-        <div className="space-y-4">
-            <div>
-                <label htmlFor="stage1-prompt" className="block text-sm font-medium text-gray-300 mb-2">1단계: 키워드 추출 프롬프트</label>
-                <Textarea
-                    id="stage1-prompt"
-                    value={prompts.stage1_destinations_prompt}
-                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setPrompts(p => ({ ...p, stage1_destinations_prompt: e.target.value }))}
-                    placeholder="1단계 프롬프트를 입력하세요..."
-                    className="w-full bg-gray-950 text-gray-200 border-gray-700 rounded-md p-3 h-48 focus:ring-2 focus:ring-blue-400"
-                />
-            </div>
-            <div>
-                <label htmlFor="stage3-prompt" className="block text-sm font-medium text-gray-300 mb-2">3단계: 상세 일정 구체화 프롬프트</label>
-                <Textarea
-                    id="stage3-prompt"
-                    value={prompts.stage3_detailed_itinerary_prompt}
-                    onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setPrompts(p => ({ ...p, stage3_detailed_itinerary_prompt: e.target.value }))}
-                    placeholder="3단계 프롬프트를 입력하세요..."
-                    className="w-full bg-gray-950 text-gray-200 border-gray-700 rounded-md p-3 h-48 focus:ring-2 focus:ring-purple-400"
-                />
-            </div>
+      {/* Status Messages */}
+      {successMessage && (
+        <div className="p-4 rounded-lg text-center font-semibold bg-green-900 text-green-200 flex items-center justify-center">
+          <CheckCircle className="h-5 w-5 mr-2" />
+          {successMessage}
         </div>
-      </Card>
+      )}
+      {error && (
+        <div className="p-4 rounded-lg text-center font-semibold bg-red-900 text-red-200 flex items-center justify-center">
+          <AlertCircle className="h-5 w-5 mr-2" />
+          {error}
+        </div>
+      )}
 
-      <div className="flex justify-end mt-8">
-        <Button
-          onClick={saveAllSettings}
-          disabled={loading}
-          className="btn-gradient px-8 py-2 text-lg font-bold shadow-lg"
+      {/* Tab Navigation */}
+      <div className="flex space-x-1 rounded-lg bg-gray-800 p-1">
+        <button
+          onClick={() => setActiveTab('settings')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            activeTab === 'settings' 
+              ? 'bg-blue-600 text-white' 
+              : 'text-gray-300 hover:text-white'
+          }`}
         >
-          {loading ? '저장 중...' : '전체 설정 저장'}
-        </Button>
+          <Settings className="inline h-4 w-4 mr-1" />
+          AI 설정
+        </button>
+        <button
+          onClick={() => setActiveTab('prompts')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            activeTab === 'prompts' 
+              ? 'bg-blue-600 text-white' 
+              : 'text-gray-300 hover:text-white'
+          }`}
+        >
+          <Cpu className="inline h-4 w-4 mr-1" />
+          마스터 프롬프트
+        </button>
+        <button
+          onClick={() => setActiveTab('status')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+            activeTab === 'status' 
+              ? 'bg-blue-600 text-white' 
+              : 'text-gray-300 hover:text-white'
+          }`}
+        >
+          <Database className="inline h-4 w-4 mr-1" />
+          시스템 상태
+        </button>
       </div>
-      <Card className="p-6 mt-8 bg-gradient-to-r from-gray-900 to-gray-800 border-0 shadow-lg">
-        <h3 className="text-lg font-semibold mb-4 text-blue-200">현재 사용중인 AI 설정 (DB 기준)</h3>
-        {currentSettings ? (
-          <div className="flex flex-col gap-2 text-base">
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-400">기본 제공자:</span>
-              <span className={`px-2 py-1 rounded font-bold ${currentSettings.default_provider === 'openai' ? 'bg-blue-700 text-blue-100' : 'bg-purple-700 text-purple-100'}`}>{currentSettings.default_provider === 'openai' ? 'OpenAI GPT' : 'Google Gemini'}</span>
+
+      {/* AI Settings Tab */}
+      {activeTab === 'settings' && currentSettings && (
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-4">AI 제공자 설정</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Provider Selection */}
+            <div>
+              <label className="block text-sm font-medium mb-2">AI 제공자</label>
+              <Select
+                value={currentSettings.provider}
+                onChange={(value) => setCurrentSettings({...currentSettings, provider: value as 'openai' | 'gemini'})}
+                options={[
+                  { value: 'openai', label: '🤖 OpenAI (ChatGPT)' },
+                  { value: 'gemini', label: '💎 Google Gemini' }
+                ]}
+              />
             </div>
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-400">현재 활성화된 모델:</span>
-              <span className="px-2 py-1 rounded bg-gray-700 text-white font-mono">
-                {currentSettings.default_provider === 'openai' ? currentSettings.openai_model_name : currentSettings.gemini_model_name}
-              </span>
+
+            {/* OpenAI Model */}
+            <div>
+              <label className="block text-sm font-medium mb-2">OpenAI 모델</label>
+              <Select
+                value={currentSettings.openai_model}
+                onChange={(value) => setCurrentSettings({...currentSettings, openai_model: value})}
+                options={OPENAI_MODELS}
+              />
+            </div>
+
+            {/* Gemini Model */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Gemini 모델</label>
+              <Select
+                value={currentSettings.gemini_model}
+                onChange={(value) => setCurrentSettings({...currentSettings, gemini_model: value})}
+                options={GEMINI_MODELS}
+              />
+            </div>
+
+            {/* Temperature */}
+            <div>
+              <label className="block text-sm font-medium mb-2">창의성 (Temperature): {currentSettings.temperature}</label>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
+                value={currentSettings.temperature}
+                onChange={(e) => setCurrentSettings({...currentSettings, temperature: parseFloat(e.target.value)})}
+                className="w-full"
+              />
+              <div className="text-xs text-gray-400 mt-1">0 = 일관성 중심, 1 = 창의성 중심</div>
+            </div>
+
+            {/* Max Tokens */}
+            <div>
+              <label className="block text-sm font-medium mb-2">최대 토큰 수</label>
+              <input
+                type="number"
+                min="500"
+                max="4000"
+                value={currentSettings.max_tokens}
+                onChange={(e) => setCurrentSettings({...currentSettings, max_tokens: parseInt(e.target.value)})}
+                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white"
+              />
             </div>
           </div>
-        ) : <p>설정 정보를 불러오지 못했습니다.</p>}
-      </Card>
+
+          <div className="flex space-x-4 mt-6">
+            <Button 
+              onClick={saveAISettings} 
+              disabled={saving}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {saving ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <Settings className="h-4 w-4 mr-2" />}
+              AI 설정 저장
+            </Button>
+            <Button 
+              onClick={testAIGeneration} 
+              disabled={saving}
+              variant="outline"
+            >
+              {saving ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <Cpu className="h-4 w-4 mr-2" />}
+              AI 테스트
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {/* Master Prompts Tab */}
+      {activeTab === 'prompts' && (
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-4">마스터 프롬프트 관리</h2>
+          
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">프롬프트 타입</label>
+            <Select
+              value={selectedPromptType}
+              onChange={setSelectedPromptType}
+              options={PROMPT_TYPES}
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">프롬프트 내용</label>
+            <Textarea
+              value={promptContent}
+              onChange={(e) => setPromptContent(e.target.value)}
+              rows={15}
+              className="w-full"
+              placeholder="마스터 프롬프트를 입력하세요..."
+            />
+          </div>
+
+          <Button 
+            onClick={savePrompt} 
+            disabled={saving}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            {saving ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <CheckCircle className="h-4 w-4 mr-2" />}
+            프롬프트 저장
+          </Button>
+        </Card>
+      )}
+
+      {/* System Status Tab */}
+      {activeTab === 'status' && systemStatus && (
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-4">시스템 상태</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 bg-gray-800 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span>Supabase 연결</span>
+                <span className={`flex items-center ${systemStatus.supabase_connected ? 'text-green-400' : 'text-red-400'}`}>
+                  {systemStatus.supabase_connected ? <CheckCircle className="h-4 w-4 mr-1" /> : <AlertCircle className="h-4 w-4 mr-1" />}
+                  {systemStatus.supabase_connected ? '연결됨' : '연결 안됨'}
+                </span>
+              </div>
+            </div>
+
+            <div className="p-4 bg-gray-800 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span>현재 AI 제공자</span>
+                <span className="font-semibold">{systemStatus.current_ai_provider}</span>
+              </div>
+            </div>
+
+            <div className="p-4 bg-gray-800 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span>AI 모델</span>
+                <span className="font-semibold">{systemStatus.ai_model}</span>
+              </div>
+            </div>
+
+            <div className="p-4 bg-gray-800 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span>시스템 준비 상태</span>
+                <span className={`flex items-center ${systemStatus.system_ready ? 'text-green-400' : 'text-yellow-400'}`}>
+                  {systemStatus.system_ready ? <CheckCircle className="h-4 w-4 mr-1" /> : <AlertCircle className="h-4 w-4 mr-1" />}
+                  {systemStatus.system_ready ? '준비됨' : '설정 필요'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <Button 
+            onClick={fetchData} 
+            className="mt-4"
+            variant="outline"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            상태 새로고침
+          </Button>
+        </Card>
+      )}
     </div>
   )
-} 
+}
